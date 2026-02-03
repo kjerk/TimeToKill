@@ -1,5 +1,6 @@
 # Developer Scripts
 /*.bat
+!build_standalone.bat
 *.env
 
 # Logs
