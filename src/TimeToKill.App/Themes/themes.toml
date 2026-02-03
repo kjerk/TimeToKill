@@ -1,0 +1,187 @@
+# All themes inherit from [themes.base] - only override what differs
+
+[themes.base]
+AppBackground = "#1a1a24"
+SurfaceBackground = "#1a1a24"
+CardBackground = "#242430"
+CardBackgroundHover = "#2c2c3a"
+BorderSubtle = "rgba(255,255,255,0.06)"
+BorderMedium = "rgba(255,255,255,0.1)"
+
+TextPrimary = "#e8e8ed"
+TextSecondary = "#8b8b98"
+TextTertiary = "#55555f"
+TextInverse = "#ffffff"
+
+AccentPrimary = "#6366f1"
+AccentPrimaryHover = "#7577f5"
+AccentSuccess = "#22c55e"
+AccentSuccessBackground = "rgba(34,197,94,0.08)"
+AccentWarning = "#f59e0b"
+AccentDanger = "#ef4444"
+AccentDangerHover = "#f87171"
+AccentDangerBackground = "rgba(239,68,68,0.08)"
+
+ButtonSecondaryBackground = "#242430"
+ButtonSecondaryBackgroundHover = "#2c2c3a"
+InputBackground = "#12121a"
+InputBorder = "rgba(255,255,255,0.06)"
+ProgressBackground = "rgba(255,255,255,0.05)"
+ProgressForeground = "#6366f1"
+
+
+[themes.default-dark]
+# Uses base as-is - this is the dark default
+
+
+[themes.default-light]
+AppBackground = "#ffffff"
+SurfaceBackground = "#f8f9fa"
+CardBackground = "#ffffff"
+CardBackgroundHover = "#f1f3f4"
+
+BorderSubtle = "#e5e7eb"
+BorderMedium = "#d1d5db"
+
+TextPrimary = "#1f2937"
+TextSecondary = "#4b5563"
+TextTertiary = "#9ca3af"
+TextInverse = "#ffffff"
+
+AccentPrimary = "#4f46e5"
+AccentPrimaryHover = "#4338ca"
+AccentSuccess = "#16a34a"
+AccentSuccessBackground = "rgba(22,163,74,0.1)"
+AccentWarning = "#ea580c"
+AccentDanger = "#dc2626"
+AccentDangerHover = "#b91c1c"
+AccentDangerBackground = "rgba(220,38,38,0.1)"
+
+ButtonSecondaryBackground = "#f1f3f4"
+ButtonSecondaryBackgroundHover = "#e5e7eb"
+InputBackground = "#ffffff"
+InputBorder = "#d1d5db"
+
+ProgressBackground = "#e5e7eb"
+ProgressForeground = "#4f46e5"
+
+
+[themes.zenburn]
+AppBackground = "#3f3f3f"
+SurfaceBackground = "#4f4f4f"
+CardBackground = "#434443"
+CardBackgroundHover = "#525252"
+BorderSubtle = "#484848"
+BorderMedium = "#4f4f4f"
+
+TextPrimary = "#dcdccc"
+TextSecondary = "#c0c0a0"
+TextTertiary = "#7f9f7f"
+TextInverse = "#2b2b2b"
+
+AccentPrimary = "#dfaf8f"
+AccentPrimaryHover = "#e5bfa0"
+AccentSuccess = "#7f9f7f"
+AccentSuccessBackground = "rgba(127,159,127,0.15)"
+AccentWarning = "#dfaf8f"
+AccentDanger = "#cc9393"
+AccentDangerHover = "#dca3a3"
+AccentDangerBackground = "rgba(204,147,147,0.15)"
+
+ButtonSecondaryBackground = "#434443"
+ButtonSecondaryBackgroundHover = "#525252"
+InputBackground = "#3f3f3f"
+InputBorder = "#4f4f4f"
+ProgressBackground = "#484848"
+ProgressForeground = "#dfaf8f"
+
+
+[themes.monokai]
+AppBackground = "#272822"
+SurfaceBackground = "#3e3d32"
+CardBackground = "#49483e"
+CardBackgroundHover = "#555446"
+BorderSubtle = "#3e3d32"
+BorderMedium = "#49483e"
+
+TextPrimary = "#f8f8f2"
+TextSecondary = "#cfcfc2"
+TextTertiary = "#75715e"
+TextInverse = "#272822"
+
+# Orange accent
+AccentPrimary = "#fd971f"
+AccentPrimaryHover = "#ffab40"
+AccentSuccess = "#a6e22e"
+AccentSuccessBackground = "rgba(166,226,46,0.15)"
+AccentWarning = "#e6db74"
+AccentDanger = "#f92672"
+AccentDangerHover = "#ff3682"
+AccentDangerBackground = "rgba(249,38,114,0.15)"
+
+ButtonSecondaryBackground = "#49483e"
+ButtonSecondaryBackgroundHover = "#555446"
+InputBackground = "#3e3d32"
+InputBorder = "#49483e"
+ProgressBackground = "#3e3d32"
+ProgressForeground = "#fd971f"
+
+
+[themes.solarized-dark]
+AppBackground = "#002b36"
+SurfaceBackground = "#073642"
+CardBackground = "#094050"
+CardBackgroundHover = "#0a4a5a"
+BorderSubtle = "#073642"
+BorderMedium = "#094050"
+
+TextPrimary = "#839496"
+TextSecondary = "#657b83"
+TextTertiary = "#586e75"
+TextInverse = "#fdf6e3"
+
+AccentPrimary = "#268bd2"
+AccentPrimaryHover = "#2e9be2"
+AccentSuccess = "#859900"
+AccentSuccessBackground = "rgba(133,153,0,0.15)"
+AccentWarning = "#b58900"
+AccentDanger = "#dc322f"
+AccentDangerHover = "#ec423f"
+AccentDangerBackground = "rgba(220,50,47,0.15)"
+
+ButtonSecondaryBackground = "#094050"
+ButtonSecondaryBackgroundHover = "#0a4a5a"
+InputBackground = "#073642"
+InputBorder = "#094050"
+ProgressBackground = "#073642"
+ProgressForeground = "#268bd2"
+
+
+[themes.solarized-light]
+AppBackground = "#fdf6e3"
+SurfaceBackground = "#eee8d5"
+CardBackground = "#f5efdc"
+CardBackgroundHover = "#e5dfcc"
+BorderSubtle = "#eee8d5"
+BorderMedium = "#e5dfcc"
+
+TextPrimary = "#586e75"
+TextSecondary = "#657b83"
+TextTertiary = "#93a1a1"
+TextInverse = "#fdf6e3"
+
+AccentPrimary = "#268bd2"
+AccentPrimaryHover = "#2176b8"
+AccentSuccess = "#859900"
+AccentSuccessBackground = "rgba(133,153,0,0.12)"
+AccentWarning = "#b58900"
+AccentDanger = "#dc322f"
+AccentDangerHover = "#cc221f"
+AccentDangerBackground = "rgba(220,50,47,0.12)"
+
+ButtonSecondaryBackground = "#e5dfcc"
+ButtonSecondaryBackgroundHover = "#dcd6c3"
+InputBackground = "#fdf6e3"
+InputBorder = "#e5dfcc"
+ProgressBackground = "#eee8d5"
+ProgressForeground = "#268bd2"

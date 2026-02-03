@@ -1,0 +1,51 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="TimeToKill.App.App"
+             xmlns:app="clr-namespace:TimeToKill.App"
+             RequestedThemeVariant="Dark">
+
+	<Application.DataTemplates>
+		<app:ViewLocator />
+	</Application.DataTemplates>
+
+	<Application.Styles>
+		<SimpleTheme />
+
+		<!-- Globally dynamic styles -->
+		<Style Selector="Window">
+			<Setter Property="Background" Value="{DynamicResource AppBackground}" />
+			<Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+		</Style>
+
+		<Style Selector="TextBlock">
+			<Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+		</Style>
+
+		<Style Selector="TextBox">
+			<Setter Property="Background" Value="{DynamicResource InputBackground}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource InputBorder}" />
+			<Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+		</Style>
+
+		<Style Selector="NumericUpDown">
+			<Setter Property="Background" Value="{DynamicResource InputBackground}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource InputBorder}" />
+			<Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+		</Style>
+
+		<Style Selector="CheckBox">
+			<Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+		</Style>
+
+		<Style Selector="ProgressBar">
+			<Setter Property="Background" Value="{DynamicResource ProgressBackground}" />
+			<Setter Property="Foreground" Value="{DynamicResource ProgressForeground}" />
+		</Style>
+
+		<Style Selector="ComboBox">
+			<Setter Property="Background" Value="{DynamicResource InputBackground}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource InputBorder}" />
+			<Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+		</Style>
+	</Application.Styles>
+</Application>

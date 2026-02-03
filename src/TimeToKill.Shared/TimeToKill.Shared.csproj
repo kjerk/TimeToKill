@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<RootNamespace>TimeToKill</RootNamespace>
+		<LangVersion>latestmajor</LangVersion>
+	</PropertyGroup>
+	
+	<ItemGroup>
+	  <PackageReference Include="Tomlyn" Version="0.20.0" />
+	</ItemGroup>
+
+</Project>

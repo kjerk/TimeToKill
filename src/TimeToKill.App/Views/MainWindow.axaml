@@ -1,0 +1,505 @@
+<Window xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:vm="clr-namespace:TimeToKill.App.ViewModels"
+		xmlns:models="clr-namespace:TimeToKill.Models;assembly=TimeToKill.Shared"
+		xmlns:i="https://github.com/projektanker/icons.avalonia"
+		mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="520"
+		x:Class="TimeToKill.App.Views.MainWindow"
+		x:DataType="vm:MainWindowViewModel"
+		Icon="/Assets/avalonia-logo.ico"
+		Title="TimeToKill"
+		MinWidth="340" MinHeight="280"
+		Width="400" Height="520"
+		WindowStartupLocation="CenterScreen">
+
+	<Design.DataContext>
+		<vm:MainWindowViewModel/>
+	</Design.DataContext>
+
+	<Window.Styles>
+		<!-- Edit Form Card -->
+		<Style Selector="Border.edit-card">
+			<Setter Property="Background" Value="{DynamicResource CardBackground}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource BorderSubtle}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="CornerRadius" Value="6"/>
+			<Setter Property="Padding" Value="16"/>
+			<Setter Property="Margin" Value="12"/>
+		</Style>
+
+		<!-- Timer Row Container -->
+		<Style Selector="Border.timer-row">
+			<Setter Property="Background" Value="{DynamicResource CardBackground}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource BorderSubtle}"/>
+			<Setter Property="BorderThickness" Value="0,0,0,1"/>
+			<Setter Property="CornerRadius" Value="0"/>
+			<Setter Property="Padding" Value="0"/>
+			<Setter Property="Margin" Value="0"/>
+		</Style>
+
+		<!-- Timer Row Active Accent (left bar) -->
+		<Style Selector="Border.timer-accent">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="Width" Value="3"/>
+		</Style>
+		<Style Selector="Border.timer-accent.active">
+			<Setter Property="Background" Value="{DynamicResource AccentPrimary}"/>
+		</Style>
+
+		<!-- Timer Row Active (bottom border highlight) -->
+		<Style Selector="Border.timer-row.active">
+			<Setter Property="BorderBrush" Value="{DynamicResource AccentPrimary}"/>
+		</Style>
+
+		<!-- Primary Button -->
+		<Style Selector="Button.primary">
+			<Setter Property="Background" Value="{DynamicResource AccentPrimary}"/>
+			<Setter Property="Foreground" Value="{DynamicResource TextInverse}"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="CornerRadius" Value="6"/>
+			<Setter Property="Padding" Value="12,6"/>
+			<Setter Property="FontWeight" Value="SemiBold"/>
+			<Setter Property="FontSize" Value="12"/>
+		</Style>
+		<Style Selector="Button.primary TextBlock">
+			<Setter Property="Foreground" Value="{DynamicResource TextInverse}"/>
+			<Setter Property="FontWeight" Value="SemiBold"/>
+		</Style>
+		<Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource AccentPrimaryHover}"/>
+		</Style>
+
+		<!-- Secondary Button -->
+		<Style Selector="Button.secondary">
+			<Setter Property="Background" Value="{DynamicResource ButtonSecondaryBackground}"/>
+			<Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource BorderMedium}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="CornerRadius" Value="4"/>
+			<Setter Property="Padding" Value="12,6"/>
+			<Setter Property="FontWeight" Value="SemiBold"/>
+			<Setter Property="FontSize" Value="12"/>
+		</Style>
+		<Style Selector="Button.secondary TextBlock">
+			<Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+			<Setter Property="FontWeight" Value="SemiBold"/>
+		</Style>
+		<Style Selector="Button.secondary:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource ButtonSecondaryBackgroundHover}"/>
+		</Style>
+
+		<!-- Icon Button -->
+		<Style Selector="Button.icon">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="Foreground" Value="{DynamicResource TextTertiary}"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="CornerRadius" Value="4"/>
+			<Setter Property="MinWidth" Value="28"/>
+			<Setter Property="MinHeight" Value="28"/>
+			<Setter Property="Padding" Value="6"/>
+		</Style>
+		<Style Selector="Button.icon:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource ButtonSecondaryBackgroundHover}"/>
+			<Setter Property="TextBlock.Foreground" Value="{DynamicResource TextPrimary}"/>
+		</Style>
+
+		<!-- Icon Button - Primary -->
+		<Style Selector="Button.icon-primary">
+			<Setter Property="Background" Value="{DynamicResource AccentPrimary}"/>
+			<Setter Property="Foreground" Value="{DynamicResource TextInverse}"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="CornerRadius" Value="4"/>
+			<Setter Property="MinWidth" Value="28"/>
+			<Setter Property="MinHeight" Value="28"/>
+			<Setter Property="Padding" Value="6"/>
+		</Style>
+		<Style Selector="Button.icon-primary TextBlock">
+			<Setter Property="Foreground" Value="{DynamicResource TextInverse}"/>
+		</Style>
+		<Style Selector="Button.icon-primary:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource AccentPrimaryHover}"/>
+		</Style>
+
+		<!-- Icon Button - Danger -->
+		<Style Selector="Button.icon-danger">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="Foreground" Value="{DynamicResource TextTertiary}"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="CornerRadius" Value="4"/>
+			<Setter Property="MinWidth" Value="28"/>
+			<Setter Property="MinHeight" Value="28"/>
+			<Setter Property="Padding" Value="6"/>
+		</Style>
+		<Style Selector="Button.icon-danger:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource AccentDangerBackground}"/>
+			<Setter Property="TextBlock.Foreground" Value="{DynamicResource AccentDanger}"/>
+		</Style>
+
+		<!-- Text styles -->
+		<Style Selector="TextBlock.form-title">
+			<Setter Property="FontSize" Value="12"/>
+			<Setter Property="FontWeight" Value="SemiBold"/>
+			<Setter Property="Foreground" Value="{DynamicResource AccentPrimary}"/>
+			<Setter Property="Margin" Value="0,0,0,12"/>
+		</Style>
+
+		<Style Selector="TextBlock.timer-name">
+			<Setter Property="FontSize" Value="13"/>
+			<Setter Property="FontWeight" Value="SemiBold"/>
+			<Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+		</Style>
+
+		<Style Selector="TextBlock.label">
+			<Setter Property="FontSize" Value="11"/>
+			<Setter Property="FontWeight" Value="Medium"/>
+			<Setter Property="Foreground" Value="{DynamicResource TextTertiary}"/>
+			<Setter Property="Margin" Value="0,0,0,6"/>
+		</Style>
+
+		<Style Selector="TextBlock.hint">
+			<Setter Property="FontSize" Value="10"/>
+			<Setter Property="Foreground" Value="{DynamicResource TextTertiary}"/>
+		</Style>
+
+		<!-- Badge -->
+		<Style Selector="Border.badge">
+			<Setter Property="CornerRadius" Value="3"/>
+			<Setter Property="Padding" Value="5,2"/>
+		</Style>
+
+		<!-- Preset Button -->
+		<Style Selector="Button.preset">
+			<Setter Property="Background" Value="{DynamicResource ButtonSecondaryBackground}"/>
+			<Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource BorderMedium}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="CornerRadius" Value="0"/>
+			<Setter Property="Padding" Value="8,6"/>
+			<Setter Property="Margin" Value="0"/>
+			<Setter Property="FontSize" Value="11"/>
+			<Setter Property="FontWeight" Value="ExtraBold"/>
+			<Setter Property="HorizontalAlignment" Value="Stretch"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		</Style>
+		<Style Selector="Button.preset:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource ButtonSecondaryBackgroundHover}"/>
+		</Style>
+		<!-- Round left edge of first preset -->
+		<Style Selector="Button.preset-first">
+			<Setter Property="CornerRadius" Value="4,0,0,4"/>
+		</Style>
+		<!-- Round right edge of last preset -->
+		<Style Selector="Button.preset-last">
+			<Setter Property="CornerRadius" Value="0,4,4,0"/>
+		</Style>
+
+		<!-- Flyout/Popup styling -->
+		<Style Selector="FlyoutPresenter">
+			<Setter Property="Background" Value="{DynamicResource CardBackground}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource BorderMedium}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="CornerRadius" Value="6"/>
+			<Setter Property="Padding" Value="4"/>
+		</Style>
+
+		<!-- ComboBox dropdown popup -->
+		<Style Selector="ComboBox /template/ Popup Border">
+			<Setter Property="Background" Value="{DynamicResource CardBackground}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource BorderMedium}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="CornerRadius" Value="6"/>
+			<Setter Property="Padding" Value="4"/>
+		</Style>
+
+		<!-- ComboBox items -->
+		<Style Selector="ComboBoxItem">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+			<Setter Property="CornerRadius" Value="4"/>
+			<Setter Property="Padding" Value="8,6"/>
+		</Style>
+		<Style Selector="ComboBoxItem:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource CardBackgroundHover}"/>
+		</Style>
+		<Style Selector="ComboBoxItem:selected /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource AccentPrimary}"/>
+		</Style>
+		<Style Selector="ComboBoxItem:selected">
+			<Setter Property="Foreground" Value="{DynamicResource TextInverse}"/>
+		</Style>
+
+		<!-- ListBox in flyout -->
+		<Style Selector="ListBox">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+		<Style Selector="ListBoxItem">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+			<Setter Property="CornerRadius" Value="4"/>
+			<Setter Property="Padding" Value="8,6"/>
+		</Style>
+		<Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource CardBackgroundHover}"/>
+		</Style>
+		<Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource AccentPrimary}"/>
+		</Style>
+		<Style Selector="ListBoxItem:selected">
+			<Setter Property="Foreground" Value="{DynamicResource TextInverse}"/>
+		</Style>
+	</Window.Styles>
+
+	<Grid RowDefinitions="Auto,*,Auto">
+		<!-- Header -->
+		<Border Grid.Row="0" Padding="12,10" BorderBrush="{DynamicResource BorderSubtle}" BorderThickness="0,0,0,1">
+			<Grid ColumnDefinitions="Auto,Auto,*,Auto">
+				<!-- Theme Selector Button -->
+				<Button Grid.Column="0" Classes="icon" ToolTip.Tip="Settings">
+					<Button.Flyout>
+						<Flyout Placement="BottomEdgeAlignedLeft">
+							<ListBox x:Name="ThemeSelector" SelectionChanged="OnThemeSelectionChanged"
+									 Background="Transparent" BorderThickness="0" Padding="0" MinWidth="120">
+								<ListBox.ItemTemplate>
+									<DataTemplate>
+										<TextBlock Text="{Binding}" Padding="8,6" FontSize="12"/>
+									</DataTemplate>
+								</ListBox.ItemTemplate>
+							</ListBox>
+						</Flyout>
+					</Button.Flyout>
+					<i:Icon Value="fa-solid fa-gear" FontSize="14"/>
+				</Button>
+
+				<!-- App Name -->
+				<TextBlock Grid.Column="1" Text="TimeToKill" VerticalAlignment="Center" Margin="8,0,0,0"
+						   FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondary}"/>
+
+				<!-- Add Timer Button -->
+				<Button Grid.Column="3" Classes="primary" Command="{Binding OpenAddTimerCommand}"
+						IsVisible="{Binding !IsEditingTimer}" VerticalAlignment="Center">
+					<StackPanel Orientation="Horizontal" Spacing="6">
+						<TextBlock Text="+" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+						<TextBlock Text="Add Timer" VerticalAlignment="Center"/>
+					</StackPanel>
+				</Button>
+			</Grid>
+		</Border>
+
+		<!-- Main Content -->
+		<ScrollViewer Grid.Row="1" Padding="0" VerticalScrollBarVisibility="Auto">
+			<StackPanel>
+				<!-- Edit/Add Timer Form -->
+				<Border Classes="edit-card" IsVisible="{Binding IsEditingTimer}" x:DataType="vm:MainWindowViewModel">
+					<ContentControl Content="{Binding EditTimerViewModel}">
+						<ContentControl.ContentTemplate>
+							<DataTemplate DataType="vm:EditTimerViewModel">
+								<StackPanel Spacing="14">
+									<TextBlock Classes="form-title" Text="{Binding Title}"/>
+
+									<!-- Process Name -->
+									<StackPanel Spacing="0">
+										<TextBlock Classes="label" Text="PROCESS NAME"/>
+										<TextBox Text="{Binding ProcessName}" Watermark="e.g., discord.exe"
+												 Padding="10,8" CornerRadius="4" FontSize="13"/>
+									</StackPanel>
+
+									<!-- Duration -->
+									<StackPanel Spacing="8">
+										<TextBlock Classes="label" Text="DURATION"/>
+										<!-- Time input: HH : MM : SS with labels -->
+										<Grid ColumnDefinitions="*,Auto,*,Auto,*" RowDefinitions="Auto,Auto">
+											<TextBox Grid.Row="0" Grid.Column="0" Text="{Binding HoursText}" Watermark="0"
+													 TextAlignment="Center" Padding="8" CornerRadius="4" FontSize="16" FontWeight="Medium"/>
+											<TextBlock Grid.Row="0" Grid.Column="1" Text=":" VerticalAlignment="Center" Margin="6,0"
+													   FontSize="18" FontWeight="Medium" Foreground="{DynamicResource TextTertiary}"/>
+											<TextBox Grid.Row="0" Grid.Column="2" Text="{Binding MinutesText}" Watermark="00"
+													 TextAlignment="Center" Padding="8" CornerRadius="4" FontSize="16" FontWeight="Medium"/>
+											<TextBlock Grid.Row="0" Grid.Column="3" Text=":" VerticalAlignment="Center" Margin="6,0"
+													   FontSize="18" FontWeight="Medium" Foreground="{DynamicResource TextTertiary}"/>
+											<TextBox Grid.Row="0" Grid.Column="4" Text="{Binding SecondsText}" Watermark="00"
+													 TextAlignment="Center" Padding="8" CornerRadius="4" FontSize="16" FontWeight="Medium"/>
+											<!-- Labels -->
+											<TextBlock Grid.Row="1" Grid.Column="0" Classes="hint" Text="Hours" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+											<TextBlock Grid.Row="1" Grid.Column="2" Classes="hint" Text="Minutes" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+											<TextBlock Grid.Row="1" Grid.Column="4" Classes="hint" Text="Seconds" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+										</Grid>
+										<!-- Preset buttons -->
+										<Grid ColumnDefinitions="*,*,*,*,*,*">
+											<Button Grid.Column="0" Classes="preset preset-first" Content="30s" Command="{Binding SetDurationCommand}" CommandParameter="30"/>
+											<Button Grid.Column="1" Classes="preset" Content="5m" Command="{Binding SetDurationCommand}" CommandParameter="300"/>
+											<Button Grid.Column="2" Classes="preset" Content="15m" Command="{Binding SetDurationCommand}" CommandParameter="900"/>
+											<Button Grid.Column="3" Classes="preset" Content="30m" Command="{Binding SetDurationCommand}" CommandParameter="1800"/>
+											<Button Grid.Column="4" Classes="preset" Content="1h" Command="{Binding SetDurationCommand}" CommandParameter="3600"/>
+											<Button Grid.Column="5" Classes="preset preset-last" Content="2h" Command="{Binding SetDurationCommand}" CommandParameter="7200"/>
+										</Grid>
+									</StackPanel>
+
+									<!-- Action Type -->
+									<StackPanel Spacing="0">
+										<TextBlock Classes="label" Text="ACTION"/>
+										<ComboBox ItemsSource="{Binding ActionTypeOptions}"
+												  SelectedItem="{Binding SelectedActionType}"
+												  Padding="10,8" CornerRadius="4" FontSize="13"
+												  HorizontalAlignment="Stretch"/>
+									</StackPanel>
+
+									<!-- Auto Run on Start -->
+									<CheckBox IsChecked="{Binding AutoRunOnStart}" Margin="0,4,0,0">
+										<TextBlock Text="Auto-start on launch" FontSize="12" Foreground="{DynamicResource TextSecondary}"/>
+									</CheckBox>
+
+									<!-- Validation Error -->
+									<Border Background="{DynamicResource AccentDangerBackground}" CornerRadius="4" Padding="10"
+											IsVisible="{Binding HasValidationError}">
+										<TextBlock Text="{Binding ValidationError}" Foreground="{DynamicResource AccentDanger}" FontSize="12"/>
+									</Border>
+
+									<!-- Buttons -->
+									<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
+										<Button Classes="secondary" Content="Cancel" Command="{Binding CancelCommand}"/>
+										<Button Classes="primary" Content="Save" Command="{Binding SaveCommand}"/>
+									</StackPanel>
+								</StackPanel>
+							</DataTemplate>
+						</ContentControl.ContentTemplate>
+					</ContentControl>
+				</Border>
+
+				<!-- Empty State -->
+				<Border Classes="edit-card" IsVisible="{Binding !HasPresets}" HorizontalAlignment="Stretch">
+					<StackPanel HorizontalAlignment="Center" Spacing="8" Margin="0,16">
+						<TextBlock Text="No timers" HorizontalAlignment="Center" FontSize="13"
+								   Foreground="{DynamicResource TextSecondary}"/>
+						<TextBlock Classes="hint" Text="Click 'Add Timer' to create one"
+								   HorizontalAlignment="Center" TextAlignment="Center"/>
+					</StackPanel>
+				</Border>
+
+				<!-- Timer Rows - FLUSH -->
+				<ItemsControl ItemsSource="{Binding Presets}" IsVisible="{Binding HasPresets}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate DataType="vm:TimerPresetViewModel">
+							<Border Classes="timer-row" Classes.active="{Binding IsActive}">
+								<Grid ColumnDefinitions="Auto,*">
+									<!-- Left Accent Bar -->
+									<Border Grid.Column="0" Classes="timer-accent" Classes.active="{Binding IsActive}"/>
+
+									<!-- Timer Content -->
+									<Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto" Margin="14,12">
+										<!-- Header Row -->
+										<Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+											<StackPanel Grid.Column="0" Spacing="4">
+												<TextBlock Classes="timer-name" Text="{Binding ProcessName}"/>
+												<StackPanel Orientation="Horizontal" Spacing="6">
+													<TextBlock Text="{Binding DurationDisplay}" FontSize="12"
+															   Foreground="{DynamicResource TextSecondary}"/>
+													<Border Classes="badge" Background="{DynamicResource SurfaceBackground}">
+														<TextBlock Text="{Binding ActionTypeDisplay}" FontSize="10"
+																   Foreground="{DynamicResource TextTertiary}"/>
+													</Border>
+													<Border Classes="badge" Background="{DynamicResource AccentSuccessBackground}"
+															IsVisible="{Binding AutoRunOnStart}">
+														<TextBlock Text="AUTO" FontSize="9" FontWeight="SemiBold"
+																   Foreground="{DynamicResource AccentSuccess}"/>
+													</Border>
+												</StackPanel>
+											</StackPanel>
+
+											<!-- Control Buttons -->
+											<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="2">
+												<!-- Play Button (when stopped) -->
+												<Button Classes="icon-primary" Command="{Binding StartCommand}" ToolTip.Tip="Start">
+													<Button.IsVisible>
+														<MultiBinding Converter="{x:Static BoolConverters.And}">
+															<Binding Path="!IsRunning"/>
+															<Binding Path="!IsPaused"/>
+														</MultiBinding>
+													</Button.IsVisible>
+													<TextBlock Text="▶" FontSize="11"/>
+												</Button>
+
+												<!-- Pause Button (when running) -->
+												<Button Classes="icon" Command="{Binding PauseCommand}"
+														IsVisible="{Binding IsRunning}" ToolTip.Tip="Pause">
+													<TextBlock Text="⏸" FontSize="11"/>
+												</Button>
+
+												<!-- Resume Button (when paused) -->
+												<Button Classes="icon-primary" Command="{Binding ResumeCommand}"
+														IsVisible="{Binding IsPaused}" ToolTip.Tip="Resume">
+													<TextBlock Text="▶" FontSize="11"/>
+												</Button>
+
+												<!-- Stop Button (when running or paused) -->
+												<Button Classes="icon" Command="{Binding CancelCommand}" ToolTip.Tip="Stop">
+													<Button.IsVisible>
+														<MultiBinding Converter="{x:Static BoolConverters.Or}">
+															<Binding Path="IsRunning"/>
+															<Binding Path="IsPaused"/>
+														</MultiBinding>
+													</Button.IsVisible>
+													<TextBlock Text="⏹" FontSize="11"/>
+												</Button>
+
+												<!-- Edit Button -->
+												<Button Classes="icon" Command="{Binding EditCommand}" ToolTip.Tip="Edit">
+													<TextBlock Text="✎" FontSize="12"/>
+												</Button>
+
+												<!-- Delete Button -->
+												<Button Classes="icon-danger" Command="{Binding DeleteCommand}" ToolTip.Tip="Delete">
+													<TextBlock Text="×" FontSize="16" FontWeight="Bold"/>
+												</Button>
+											</StackPanel>
+										</Grid>
+
+										<!-- Progress Bar (when active) -->
+										<ProgressBar Grid.Row="1" Value="{Binding ProgressPercentage}" Maximum="100"
+													 Height="3" CornerRadius="1" Margin="0,10,0,0">
+											<ProgressBar.IsVisible>
+												<MultiBinding Converter="{x:Static BoolConverters.Or}">
+													<Binding Path="IsRunning"/>
+													<Binding Path="IsPaused"/>
+												</MultiBinding>
+											</ProgressBar.IsVisible>
+										</ProgressBar>
+
+										<!-- Status Row (when active) -->
+										<Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,6,0,0">
+											<Grid.IsVisible>
+												<MultiBinding Converter="{x:Static BoolConverters.Or}">
+													<Binding Path="IsRunning"/>
+													<Binding Path="IsPaused"/>
+												</MultiBinding>
+											</Grid.IsVisible>
+											<TextBlock Grid.Column="0" Text="{Binding StateDisplay}" FontSize="11"
+													   Foreground="{DynamicResource AccentPrimary}"/>
+											<TextBlock Grid.Column="1" Text="{Binding RemainingDisplayFull}" FontSize="11"
+													   Foreground="{DynamicResource TextTertiary}"/>
+										</Grid>
+									</Grid>
+								</Grid>
+							</Border>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</StackPanel>
+		</ScrollViewer>
+
+		<!-- Notification Bar -->
+		<Border Grid.Row="2" Padding="12,10" IsVisible="{Binding HasNotification}"
+				Background="{DynamicResource AccentSuccessBackground}" BorderBrush="Transparent" BorderThickness="0">
+			<Grid ColumnDefinitions="Auto,*,Auto">
+				<TextBlock Grid.Column="0" Text="✓" FontSize="12" Foreground="{DynamicResource AccentSuccess}"
+						   VerticalAlignment="Center" Margin="0,0,8,0"/>
+				<TextBlock Grid.Column="1" Text="{Binding LastNotification}" VerticalAlignment="Center"
+						   Foreground="{DynamicResource AccentSuccess}" FontSize="12"/>
+				<Button Grid.Column="2" Classes="secondary" Content="Dismiss"
+						Command="{Binding DismissNotificationCommand}"
+						BorderBrush="{DynamicResource AccentSuccess}" Foreground="{DynamicResource AccentSuccess}"/>
+			</Grid>
+		</Border>
+	</Grid>
+</Window>
