@@ -69,9 +69,14 @@ public static class ProcessTools
 		if (name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)) {
 			name = name[..^4];
 		}
-		
+
 		try {
-			return Process.GetProcessesByName(name).Length;
+			var processes = Process.GetProcessesByName(name);
+			var count = processes.Length;
+			foreach (var proc in processes) {
+				proc.Dispose();
+			}
+			return count;
 		} catch {
 			return 0;
 		}
@@ -88,25 +93,31 @@ public static class ProcessTools
 		if (processes.Length == 0) {
 			return (false, 0, $"No processes found matching '{processName}'");
 		}
-		
+
 		int suspended = 0;
-		foreach (var proc in processes) {
-			try {
-				// Suspend via NtSuspendProcess or by suspending all threads
-				foreach (ProcessThread thread in proc.Threads) {
-					var threadHandle = OpenThread(0x0002, false, (uint)thread.Id); // THREAD_SUSPEND_RESUME
-					if (threadHandle != IntPtr.Zero) {
-						SuspendThread(threadHandle);
-						CloseHandle(threadHandle);
+		try {
+			foreach (var proc in processes) {
+				try {
+					// Suspend via NtSuspendProcess or by suspending all threads
+					foreach (ProcessThread thread in proc.Threads) {
+						var threadHandle = OpenThread(0x0002, false, (uint)thread.Id); // THREAD_SUSPEND_RESUME
+						if (threadHandle != IntPtr.Zero) {
+							SuspendThread(threadHandle);
+							CloseHandle(threadHandle);
+						}
 					}
+
+					suspended++;
+				} catch {
+					// Continue with other processes
 				}
-				
-				suspended++;
-			} catch {
-				// Continue with other processes
+			}
+		} finally {
+			foreach (var proc in processes) {
+				proc.Dispose();
 			}
 		}
-		
+
 		return suspended > 0
 			? (true, suspended, null)
 			: (false, 0, "Failed to suspend any processes");
@@ -119,23 +130,30 @@ public static class ProcessTools
 		if (processes.Length == 0) {
 			return (false, 0, $"No processes found matching '{processName}'");
 		}
-		
+
 		int demoted = 0;
-		foreach (var proc in processes) {
-			try {
-				proc.PriorityClass = ProcessPriorityClass.BelowNormal;
-				demoted++;
-			} catch {
-				// Continue with other processes
+		try {
+			foreach (var proc in processes) {
+				try {
+					proc.PriorityClass = ProcessPriorityClass.BelowNormal;
+					demoted++;
+				} catch {
+					// Continue with other processes
+				}
+			}
+		} finally {
+			foreach (var proc in processes) {
+				proc.Dispose();
 			}
 		}
-		
+
 		return demoted > 0
 			? (true, demoted, null)
 			: (false, 0, "Failed to demote priority of any processes");
 	}
 	
-	public static Process[] GetProcessesByName(string processName)
+	// Returns Process objects that MUST be disposed by the caller.
+	private static Process[] GetProcessesByName(string processName)
 	{
 		var name = processName.Trim();
 		if (name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)) {

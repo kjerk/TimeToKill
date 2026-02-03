@@ -103,6 +103,7 @@ public partial class MainWindowViewModel : ViewModelBase
 	
 	private void OnTimerTick(object sender, TimerTickEventArgs e)
 	{
+		Console.WriteLine($"[DEBUG] MainWindowViewModel.OnTimerTick fired for {e.Timer.ProcessName}");
 		OnPropertyChanged(nameof(TrayTooltipText));
 		OnPropertyChanged(nameof(HasActiveTimers));
 		OnPropertyChanged(nameof(HasRunningTimers));

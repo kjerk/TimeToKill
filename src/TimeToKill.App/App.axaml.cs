@@ -26,6 +26,7 @@ public partial class App : Application
 	private TimerManager _timerManager;
 	private TrayIcon _trayIcon;
 	private Bitmap _currentTrayBitmap;
+	private DispatcherTimer _flashTimer;
 	
 	private const string DefaultTheme = "default-dark";
 	
@@ -68,18 +69,30 @@ public partial class App : Application
 	private void SetupTrayIcon()
 	{
 		_currentTrayBitmap = TrayIconGenerator.GenerateIcon(TrayStatus.Idle);
-		
+
 		_trayIcon = new TrayIcon {
 			Icon = new WindowIcon(_currentTrayBitmap),
 			ToolTipText = MainViewModel.TrayTooltipText,
 			IsVisible = true,
 			Menu = CreateTrayMenu()
 		};
-		
+
 		_trayIcon.Clicked += OnTrayIconClicked;
-		
+
+		// Make a new timer specifically for flashing the icon after a timer fires, reusable.
+		_flashTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
+		_flashTimer.Tick += OnFlashTimerTick;
+
 		var icons = new TrayIcons { _trayIcon };
 		TrayIcon.SetIcons(this, icons);
+	}
+
+	private void OnFlashTimerTick(object sender, EventArgs e)
+	{
+		_flashTimer.Stop();
+		var status = _timerManager.HasRunningTimers ? TrayStatus.Active : TrayStatus.Idle;
+		UpdateTrayIcon(status);
+		UpdateTrayTooltip();
 	}
 	
 	private NativeMenu CreateTrayMenu()
@@ -115,19 +128,11 @@ public partial class App : Application
 	private void OnTimerCompleted(object sender, TimerCompletedEventArgs e)
 	{
 		Dispatcher.UIThread.Post(() => {
-			// Briefly show red, then return to appropriate state
 			UpdateTrayIcon(TrayStatus.Fired);
 			UpdateTrayTooltip();
-			
-			// Update status again after three seconds
-			var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
-			timer.Tick += (s, args) => {
-				timer.Stop();
-				var status = _timerManager.HasRunningTimers ? TrayStatus.Active : TrayStatus.Idle;
-				UpdateTrayIcon(status);
-				UpdateTrayTooltip();
-			};
-			timer.Start();
+
+			_flashTimer.Stop();
+			_flashTimer.Start();
 		});
 	}
 	
