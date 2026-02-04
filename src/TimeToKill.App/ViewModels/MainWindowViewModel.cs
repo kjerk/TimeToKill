@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TimeToKill.App.Services;
 using TimeToKill.Models;
+using TimeToKill.Tools;
 
 namespace TimeToKill.App.ViewModels;
 
@@ -16,7 +17,10 @@ public partial class MainWindowViewModel : ViewModelBase
 	
 	[ObservableProperty]
 	private ObservableCollection<TimerPresetViewModel> _presets = new();
-	
+
+	[ObservableProperty]
+	private ObservableCollection<object> _groupedPresets = new();
+
 	[ObservableProperty]
 	private bool _isEditingTimer;
 	
@@ -76,13 +80,14 @@ public partial class MainWindowViewModel : ViewModelBase
 		var presets = _presetRepository.LoadPresets();
 		Presets.Clear();
 		
-		foreach (var preset in presets.OrderBy(p => p.CreatedAt)) {
+		foreach (var preset in presets.OrderBy(p => p.SortOrder).ThenBy(p => p.CreatedAt)) {
 			var vm = new TimerPresetViewModel(preset, _timerManager, _presetRepository, OnPresetDeleted, OnPresetEdit);
 			Presets.Add(vm);
 		}
 		
 		OnPropertyChanged(nameof(HasPresets));
-		
+		RebuildGroups();
+
 		// Auto-start timers that have AutoRunOnStart enabled
 		foreach (var presetVm in Presets.Where(p => p.AutoRunOnStart)) {
 			presetVm.StartCommand.Execute(null);
@@ -92,7 +97,9 @@ public partial class MainWindowViewModel : ViewModelBase
 	private void OnPresetDeleted(TimerPresetViewModel presetVm)
 	{
 		Presets.Remove(presetVm);
+		ReassignSortOrdersAndSave();
 		OnPropertyChanged(nameof(HasPresets));
+		RebuildGroups();
 	}
 	
 	private void OnPresetEdit(TimerPresetViewModel presetVm)
@@ -103,7 +110,6 @@ public partial class MainWindowViewModel : ViewModelBase
 	
 	private void OnTimerTick(object sender, TimerTickEventArgs e)
 	{
-		Console.WriteLine($"[DEBUG] MainWindowViewModel.OnTimerTick fired for {e.Timer.ProcessName}");
 		OnPropertyChanged(nameof(TrayTooltipText));
 		OnPropertyChanged(nameof(HasActiveTimers));
 		OnPropertyChanged(nameof(HasRunningTimers));
@@ -138,6 +144,7 @@ public partial class MainWindowViewModel : ViewModelBase
 	private void OnTimerSaved(TimerPreset preset, bool isNew)
 	{
 		if (isNew) {
+			preset.SortOrder = Presets.Count;
 			var vm = new TimerPresetViewModel(preset, _timerManager, _presetRepository, OnPresetDeleted, OnPresetEdit);
 			Presets.Add(vm);
 		} else {
@@ -149,6 +156,7 @@ public partial class MainWindowViewModel : ViewModelBase
 		}
 		
 		OnPropertyChanged(nameof(HasPresets));
+		RebuildGroups();
 		IsEditingTimer = false;
 		EditTimerViewModel = null;
 	}
@@ -159,6 +167,54 @@ public partial class MainWindowViewModel : ViewModelBase
 		EditTimerViewModel = null;
 	}
 	
+	[RelayCommand]
+	private void MoveUp(TimerPresetViewModel presetVm)
+	{
+		var index = Presets.IndexOf(presetVm);
+		if (index <= 0) return;
+		Presets.Move(index, index - 1);
+		ReassignSortOrdersAndSave();
+		RebuildGroups();
+	}
+
+	[RelayCommand]
+	private void MoveDown(TimerPresetViewModel presetVm)
+	{
+		var index = Presets.IndexOf(presetVm);
+		if (index < 0 || index >= Presets.Count - 1) return;
+		Presets.Move(index, index + 1);
+		ReassignSortOrdersAndSave();
+		RebuildGroups();
+	}
+
+	private void ReassignSortOrdersAndSave()
+	{
+		for (int i = 0; i < Presets.Count; i++) {
+			Presets[i].GetPreset().SortOrder = i;
+		}
+		_presetRepository.SavePresets(Presets.Select(p => p.GetPreset()).ToList());
+	}
+
+	private void RebuildGroups()
+	{
+		GroupedPresets.Clear();
+
+		var groups = Presets
+			.GroupBy(p => ProcessNameHelper.GetBaseNameWithoutExtension(p.ProcessName).ToLowerInvariant())
+			.ToList();
+
+		foreach (var group in groups) {
+			if (group.Count() == 1) {
+				// Single item - no group header needed
+				GroupedPresets.Add(group.First());
+			} else {
+				// Multi-item group with collapsible header
+				var displayName = ProcessNameHelper.GetExeName(group.First().ProcessName);
+				GroupedPresets.Add(new TimerGroupViewModel(displayName, group));
+			}
+		}
+	}
+
 	[RelayCommand]
 	private void DismissNotification()
 	{

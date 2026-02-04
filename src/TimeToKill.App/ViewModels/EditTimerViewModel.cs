@@ -39,6 +39,9 @@ public partial class EditTimerViewModel : ViewModelBase
 	[NotifyCanExecuteChangedFor(nameof(SaveCommand))]
 	private string _processName = string.Empty;
 
+	[ObservableProperty]
+	private string _displayLabel = string.Empty;
+
 	private int _hours;
 	private int _minutes;
 	private int _seconds;
@@ -105,6 +108,7 @@ public partial class EditTimerViewModel : ViewModelBase
 		if (existingPreset != null) {
 			_existingId = existingPreset.Id;
 			_processName = existingPreset.ProcessName;
+			_displayLabel = existingPreset.DisplayLabel ?? string.Empty;
 			_hours = existingPreset.Duration.Hours;
 			_minutes = existingPreset.Duration.Minutes;
 			_seconds = existingPreset.Duration.Seconds;
@@ -159,6 +163,7 @@ public partial class EditTimerViewModel : ViewModelBase
 			preset = new TimerPreset {
 				Id = _existingId.Value,
 				ProcessName = ProcessName.Trim(),
+				DisplayLabel = DisplayLabel?.Trim() ?? string.Empty,
 				Duration = GetTotalDuration(),
 				ActionType = actionType,
 				AutoRunOnStart = AutoRunOnStart,
@@ -168,6 +173,7 @@ public partial class EditTimerViewModel : ViewModelBase
 			isNew = false;
 		} else {
 			preset = new TimerPreset(ProcessName.Trim(), GetTotalDuration(), actionType) {
+				DisplayLabel = DisplayLabel?.Trim() ?? string.Empty,
 				AutoRunOnStart = AutoRunOnStart
 			};
 			_presetRepository.AddPreset(preset);

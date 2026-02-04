@@ -11,7 +11,9 @@ public enum TimerActionType
 	[Description("Suspend")]
 	Suspend,
 	[Description("Demote Priority")]
-	DemotePriority
+	DemotePriority,
+	[Description("Launch & Kill")]
+	LaunchAndKill
 }
 
 public static class TimerActionTypeExtensions

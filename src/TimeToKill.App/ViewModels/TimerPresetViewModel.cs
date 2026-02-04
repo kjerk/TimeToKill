@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TimeToKill.App.Services;
 using TimeToKill.Models;
+using TimeToKill.Tools;
 
 namespace TimeToKill.App.ViewModels;
 
@@ -32,6 +33,16 @@ public partial class TimerPresetViewModel : ViewModelBase
 	public TimeSpan Duration => _preset.Duration;
 	public TimerActionType ActionType => _preset.ActionType;
 	public bool AutoRunOnStart => _preset.AutoRunOnStart;
+
+	public string DisplayName
+	{
+		get
+		{
+			if (!string.IsNullOrWhiteSpace(_preset.DisplayLabel))
+				return _preset.DisplayLabel;
+			return ProcessNameHelper.GetExeName(_preset.ProcessName);
+		}
+	}
 
 	public string ActionTypeDisplay => ActionType.GetDescription();
 
@@ -125,6 +136,7 @@ public partial class TimerPresetViewModel : ViewModelBase
 		OnPropertyChanged(nameof(ActionType));
 		OnPropertyChanged(nameof(ActionTypeDisplay));
 		OnPropertyChanged(nameof(AutoRunOnStart));
+		OnPropertyChanged(nameof(DisplayName));
 	}
 
 	public void UpdateFromActiveTimer(ActiveTimer timer)

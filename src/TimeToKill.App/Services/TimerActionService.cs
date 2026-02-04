@@ -12,6 +12,7 @@ public class TimerActionService
 			TimerActionType.KillForce => ExecuteKill(processName, force: true),
 			TimerActionType.Suspend => ExecuteSuspend(processName),
 			TimerActionType.DemotePriority => ExecuteDemotePriority(processName),
+			TimerActionType.LaunchAndKill => ExecuteKill(processName, force: true),
 			_ => ActionResult.Failed(processName, actionType, $"Unknown action type: {actionType}")
 		};
 	}
@@ -21,28 +22,45 @@ public class TimerActionService
 		var (success, count, error) = ProcessTools.KillByName(processName, force);
 		var actionType = force ? TimerActionType.KillForce : TimerActionType.Kill;
 		
-		return success
-			? ActionResult.Succeeded(processName, actionType, count, $"Terminated {count} process(es)")
-			: ActionResult.Failed(processName, actionType, error);
+		if (success)
+			return ActionResult.Succeeded(processName, actionType, count, $"Terminated {count} process(es)");
+		else
+			return ActionResult.Failed(processName, actionType, error);
 	}
 	
 	private ActionResult ExecuteSuspend(string processName)
 	{
 		var (success, count, error) = ProcessTools.SuspendByName(processName);
 		
-		return success
-			? ActionResult.Succeeded(processName, TimerActionType.Suspend, count,
-				$"Suspended {count} process(es)")
-			: ActionResult.Failed(processName, TimerActionType.Suspend, error);
+		if (success)
+			return ActionResult.Succeeded(processName, TimerActionType.Suspend, count, $"Suspended {count} process(es)");
+		else
+			return ActionResult.Failed(processName, TimerActionType.Suspend, error);
 	}
 	
 	private ActionResult ExecuteDemotePriority(string processName)
 	{
 		var (success, count, error) = ProcessTools.DemotePriorityByName(processName);
 		
-		return success
-			? ActionResult.Succeeded(processName, TimerActionType.DemotePriority, count,
-				$"Demoted priority of {count} process(es)")
-			: ActionResult.Failed(processName, TimerActionType.DemotePriority, error);
+		if (success)
+			return ActionResult.Succeeded(processName, TimerActionType.DemotePriority, count, $"Demoted priority of {count} process(es)");
+		else
+			return ActionResult.Failed(processName, TimerActionType.DemotePriority, error);
+	}
+
+	// Launch a process, skipping if already running. Used by TimerManager on start for LaunchAndKill presets.
+	public ActionResult Launch(string processPath)
+	{
+		var exeName = ProcessNameHelper.GetExeName(processPath);
+		if (ProcessTools.IsProcessRunning(exeName)) {
+			return ActionResult.Succeeded(exeName, TimerActionType.LaunchAndKill, 0, "Process already running, skipping launch");
+		}
+
+		var (success, error) = ProcessTools.LaunchProcess(processPath);
+		
+		if (success)
+			return ActionResult.Succeeded(exeName, TimerActionType.LaunchAndKill, 1, "Launched process");
+		else
+			return ActionResult.Failed(exeName, TimerActionType.LaunchAndKill, error);
 	}
 }

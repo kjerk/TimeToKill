@@ -12,8 +12,8 @@ public static class ProcessTools
 			return (false, 0, "Process name cannot be empty");
 		}
 		
-		// Normalize process name - ensure it ends with .exe for taskkill
-		var targetName = processName.Trim();
+		// Strip path and normalize process name - ensure it ends with .exe for taskkill
+		var targetName = ProcessNameHelper.GetExeName(processName.Trim());
 		if (!targetName.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)) {
 			targetName += ".exe";
 		}
@@ -64,11 +64,8 @@ public static class ProcessTools
 	// Count running processes matching the given name.
 	public static int CountProcessesByName(string processName)
 	{
-		var name = processName.Trim();
-		// Remove .exe extension for Process.GetProcessesByName
-		if (name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)) {
-			name = name[..^4];
-		}
+		// Strip path and remove .exe extension for Process.GetProcessesByName
+		var name = ProcessNameHelper.GetBaseNameWithoutExtension(processName.Trim());
 
 		try {
 			var processes = Process.GetProcessesByName(name);
@@ -152,14 +149,33 @@ public static class ProcessTools
 			: (false, 0, "Failed to demote priority of any processes");
 	}
 	
+	// Launch a process by path.
+	public static (bool Success, string Error) LaunchProcess(string processPath)
+	{
+		if (string.IsNullOrWhiteSpace(processPath)) {
+			return (false, "Process path cannot be empty");
+		}
+
+		try {
+			var startInfo = new ProcessStartInfo {
+				FileName = processPath,
+				UseShellExecute = true
+			};
+			var proc = Process.Start(startInfo);
+			return proc != null
+				? (true, (string)null)
+				: (false, "Process.Start returned null");
+		} catch (Exception ex) {
+			return (false, ex.Message);
+		}
+	}
+
 	// Returns Process objects that MUST be disposed by the caller.
 	private static Process[] GetProcessesByName(string processName)
 	{
-		var name = processName.Trim();
-		if (name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)) {
-			name = name[..^4];
-		}
-		
+		// Strip path and remove .exe extension for Process.GetProcessesByName
+		var name = ProcessNameHelper.GetBaseNameWithoutExtension(processName.Trim());
+
 		try {
 			return Process.GetProcessesByName(name);
 		} catch {

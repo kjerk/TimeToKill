@@ -72,28 +72,34 @@ public class TimerManager
 	
 	public ActiveTimer Start(TimerPreset preset)
 	{
+		ActiveTimer timer;
 		lock (_lock) {
 			// Check if there's already a timer for this process
 			var existing = _activeTimers.FirstOrDefault(t =>
 				t.ProcessName.Equals(preset.ProcessName, StringComparison.OrdinalIgnoreCase) &&
 				t.State != TimerState.Completed);
-			
+
 			if (existing != null) {
 				// Cancel the existing timer before starting a new one
 				existing.State = TimerState.Completed;
 				existing.CompletedAt = DateTime.UtcNow;
 			}
-			
-			var timer = new ActiveTimer(preset);
+
+			timer = new ActiveTimer(preset);
 			_activeTimers.Add(timer);
-			
+
 			// Start the ticker if not already running
 			if (!_ticker.IsEnabled) {
 				_ticker.Start();
 			}
-			
-			return timer;
 		}
+
+		// Launch process outside the lock for LaunchAndKill
+		if (preset.ActionType == TimerActionType.LaunchAndKill) {
+			_actionService.Launch(preset.ProcessName);
+		}
+
+		return timer;
 	}
 	
 	public void Pause(Guid presetId)
