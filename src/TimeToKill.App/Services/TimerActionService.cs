@@ -49,15 +49,15 @@ public class TimerActionService
 	}
 
 	// Launch a process, skipping if already running. Used by TimerManager on start for LaunchAndKill presets.
-	public ActionResult Launch(string processPath)
+	public ActionResult Launch(string processPath, string arguments = null)
 	{
 		var exeName = ProcessNameHelper.GetExeName(processPath);
 		if (ProcessTools.IsProcessRunning(exeName)) {
 			return ActionResult.Succeeded(exeName, TimerActionType.LaunchAndKill, 0, "Process already running, skipping launch");
 		}
 
-		var (success, error) = ProcessTools.LaunchProcess(processPath);
-		
+		var (success, error) = ProcessTools.LaunchProcess(processPath, arguments);
+
 		if (success)
 			return ActionResult.Succeeded(exeName, TimerActionType.LaunchAndKill, 1, "Launched process");
 		else
