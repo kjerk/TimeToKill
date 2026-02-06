@@ -96,7 +96,7 @@ public class TimerManager
 
 		// Launch process outside the lock for LaunchAndKill
 		if (preset.ActionType == TimerActionType.LaunchAndKill) {
-			_actionService.Launch(preset.ProcessName);
+			_actionService.Launch(preset.ProcessName, preset.ActionArgs);
 		}
 
 		return timer;
