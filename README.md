@@ -1,4 +1,4 @@
-# Time To *Kill*
+# TTK -> Time To *Kill🗡️*
 
 A Windows desktop app that runs countdown timers against processes. When a timer expires, it takes an action -- kill the process, suspend it, demote its priority, or other options. Useful for automatically ending game sessions, closing distracting apps after a set period, or any situation where you want a process to stop on a schedule.
 
@@ -77,6 +77,7 @@ You can back this file up or edit it by hand if needed. The format is straightfo
 * GLOB/Relocatable paths
 * Timer nudge (add/subtract time on the fly)
 * More actions (hibernate, custom command, etc)
+* Figure out a better joke about TTL, 'time to waste' -> 'ttk'
 
 ## License
 
