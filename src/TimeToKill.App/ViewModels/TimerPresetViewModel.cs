@@ -217,6 +217,14 @@ public partial class TimerPresetViewModel : ViewModelBase
 	}
 
 	[RelayCommand]
+	private void AddTime()
+	{
+		_timerManager.AddTime(Id, Duration);
+		var timer = _timerManager.GetActiveTimerByPresetId(Id);
+		UpdateFromActiveTimer(timer);
+	}
+
+	[RelayCommand]
 	private void Edit()
 	{
 		_onEdit?.Invoke(this);

@@ -440,6 +440,17 @@
 													<TextBlock Text="▶" FontSize="11"/>
 												</Button>
 
+												<!-- Add Time Button (when running or paused) -->
+												<Button Classes="icon" Command="{Binding AddTimeCommand}" ToolTip.Tip="Add more time">
+													<Button.IsVisible>
+														<MultiBinding Converter="{x:Static BoolConverters.Or}">
+															<Binding Path="IsRunning"/>
+															<Binding Path="IsPaused"/>
+														</MultiBinding>
+													</Button.IsVisible>
+													<TextBlock Text="+" FontSize="14" FontWeight="Bold"/>
+												</Button>
+
 												<!-- Stop Button (when running or paused) -->
 												<Button Classes="icon" Command="{Binding CancelCommand}" ToolTip.Tip="Stop">
 													<Button.IsVisible>
@@ -575,6 +586,15 @@
 																<Button Classes="icon-primary" Command="{Binding ResumeCommand}"
 																		IsVisible="{Binding IsPaused}" ToolTip.Tip="Resume">
 																	<TextBlock Text="▶" FontSize="11"/>
+																</Button>
+																<Button Classes="icon" Command="{Binding AddTimeCommand}" ToolTip.Tip="Add more time">
+																	<Button.IsVisible>
+																		<MultiBinding Converter="{x:Static BoolConverters.Or}">
+																			<Binding Path="IsRunning"/>
+																			<Binding Path="IsPaused"/>
+																		</MultiBinding>
+																	</Button.IsVisible>
+																	<TextBlock Text="+" FontSize="14" FontWeight="Bold"/>
 																</Button>
 																<Button Classes="icon" Command="{Binding CancelCommand}" ToolTip.Tip="Stop">
 																	<Button.IsVisible>

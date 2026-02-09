@@ -118,10 +118,20 @@ public class TimerManager
 			var timer = _activeTimers.FirstOrDefault(t => t.PresetId == presetId);
 			if (timer != null && timer.State == TimerState.Paused) {
 				timer.State = TimerState.Running;
-				
+
 				if (!_ticker.IsEnabled) {
 					_ticker.Start();
 				}
+			}
+		}
+	}
+
+	public void AddTime(Guid presetId, TimeSpan additionalTime)
+	{
+		lock (_lock) {
+			var timer = _activeTimers.FirstOrDefault(t => t.PresetId == presetId);
+			if (timer != null && timer.State != TimerState.Completed) {
+				timer.Remaining = timer.Remaining.Add(additionalTime);
 			}
 		}
 	}
