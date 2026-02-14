@@ -78,16 +78,22 @@ jobs:
             if (total === 0) {
               body += `No screenshots captured.\n`;
             } else {
-              // Header row
-              body += `| ${files.map(f => `\`${f}\``).join(' | ')} |\n`;
-              body += `|${files.map(() => ':-:').join('|')}|\n`;
+              const cols = 3;
+              for (let i = 0; i < files.length; i += cols) {
+                const row = files.slice(i, i + cols);
+                const pad = cols - row.length;
 
-              // Image row - thumbnails linked to full size
-              const cells = files.map(f => {
-                const url = `${base}/${f}`;
-                return `<a href="${url}"><img src="${url}" width="320" alt="${f}"></a>`;
-              });
-              body += `| ${cells.join(' | ')} |\n`;
+                // Header row
+                body += `| ${row.map(f => `\`${f}\``).join(' | ')}${pad > 0 ? ' |'.repeat(pad) : ''} |\n`;
+                body += `|${row.map(() => ':-:').join('|')}${pad > 0 ? '|:-:'.repeat(pad) : ''}|\n`;
+
+                // Image row
+                const cells = row.map(f => {
+                  const url = `${base}/${f}`;
+                  return `<a href="${url}"><img src="${url}" width="320" alt="${f}"></a>`;
+                });
+                body += `| ${cells.join(' | ')}${pad > 0 ? ' |'.repeat(pad) : ''} |\n\n`;
+              }
             }
 
             body += `\n<sub><a href="${runUrl}">workflow run</a></sub>`;
