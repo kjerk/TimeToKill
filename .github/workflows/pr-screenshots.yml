@@ -50,7 +50,7 @@ jobs:
       - name: Upload screenshots to B2
         run: |
           PR_NUM=${{ github.event.pull_request.number }}
-          aws s3 sync "$SCREENSHOTS_DIR" "s3://${B2_BUCKET}/pr/${PR_NUM}/" \
+          aws s3 sync "$SCREENSHOTS_DIR" "s3://${B2_BUCKET}/TimeToKill/pr/${PR_NUM}/" \
             --endpoint-url "$B2_ENDPOINT" \
             --delete
         env:
@@ -64,25 +64,33 @@ jobs:
             const fs = require('fs');
             const dir = process.env.SCREENSHOTS_DIR;
             const prNum = context.payload.pull_request.number;
-            const base = `${process.env.B2_PUBLIC_BASE}/pr/${prNum}`;
+            const base = `${process.env.B2_PUBLIC_BASE}/TimeToKill/pr/${prNum}`;
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const sha = context.payload.pull_request.head.sha.substring(0, 7);
 
             const files = fs.existsSync(dir)
               ? fs.readdirSync(dir).filter(f => f.endsWith('.png')).sort()
               : [];
 
-            let body = `## Screenshots\n\n`;
+            const total = files.length;
+            let body = `### Screenshot Tests: ${total} captured · \`${sha}\`\n\n`;
 
-            if (files.length === 0) {
+            if (total === 0) {
               body += `No screenshots captured.\n`;
             } else {
-              for (const file of files) {
-                const name = file.replace(/^\d+_/, '').replace('.png', '').replace(/-/g, ' ');
-                body += `**${name}**\n\n![${file}](${base}/${file})\n\n`;
-              }
+              // Header row
+              body += `| ${files.map(f => `\`${f}\``).join(' | ')} |\n`;
+              body += `|${files.map(() => ':-:').join('|')}|\n`;
+
+              // Image row - thumbnails linked to full size
+              const cells = files.map(f => {
+                const url = `${base}/${f}`;
+                return `<a href="${url}"><img src="${url}" width="320" alt="${f}"></a>`;
+              });
+              body += `| ${cells.join(' | ')} |\n`;
             }
 
-            body += `---\n_[workflow run](${runUrl})_`;
+            body += `\n<sub><a href="${runUrl}">workflow run</a></sub>`;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
