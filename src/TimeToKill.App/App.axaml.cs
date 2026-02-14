@@ -7,6 +7,7 @@ using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using TimeToKill.App.Cli;
 using TimeToKill.App.Helpers;
 using TimeToKill.App.Services;
 using TimeToKill.App.Themes;
@@ -27,7 +28,8 @@ public partial class App : Application
 	private TrayIcon _trayIcon;
 	private Bitmap _currentTrayBitmap;
 	private DispatcherTimer _flashTimer;
-	
+	private CommandHandler _commandHandler;
+
 	private const string DefaultTheme = "default-dark";
 	
 	public override void Initialize()
@@ -52,13 +54,21 @@ public partial class App : Application
 			
 			MainViewModel = new MainWindowViewModel(_presetRepository, _timerManager);
 			MainWindowInstance = new MainWindow { DataContext = MainViewModel };
-			
+
+			// IPC: start pipe server and wire up command handling
+			_commandHandler = new CommandHandler(_presetRepository, MainViewModel);
+			if (Program.InstanceManager != null) {
+				Program.InstanceManager.CommandReceived += OnIpcCommandReceived;
+				Program.InstanceManager.StartPipeServer();
+			}
+			ProcessStartupCommands();
+
 			SetupTrayIcon();
-			
+
 			// Timer events for tray updates
 			_timerManager.TimerTick += OnTimerTick;
 			_timerManager.TimerCompleted += OnTimerCompleted;
-			
+
 			desktop.MainWindow = MainWindowInstance;
 			desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 		}
@@ -162,9 +172,29 @@ public partial class App : Application
 	
 	public static void ExitApplication()
 	{
+		Program.InstanceManager?.Dispose();
+
 		if (Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
 			desktop.Shutdown();
 		}
+	}
+
+	private void OnIpcCommandReceived(object sender, IpcCommand command)
+	{
+		_commandHandler.Process(command);
+	}
+
+	private void ProcessStartupCommands()
+	{
+		var opts = Program.StartupOptions;
+		if (opts == null || !opts.HasCommands)
+			return;
+
+		Dispatcher.UIThread.Post(() => {
+			if (opts.StartTimers?.Any() == true) {
+				_commandHandler.Process(IpcCommand.StartTimer(opts.StartTimers));
+			}
+		});
 	}
 	
 	private void DisableAvaloniaDataAnnotationValidation()

@@ -4,7 +4,6 @@ namespace TimeToKill.Tools;
 
 public static class ProcessNameHelper
 {
-
 	// "C:/Apps/discord.exe" -> "discord.exe", "discord.exe" -> "discord.exe"
 	public static string GetExeName(string processName)
 	{
