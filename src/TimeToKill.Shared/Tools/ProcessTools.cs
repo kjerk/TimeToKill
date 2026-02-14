@@ -149,8 +149,8 @@ public static class ProcessTools
 			: (false, 0, "Failed to demote priority of any processes");
 	}
 	
-	// Launch a process by path.
-	public static (bool Success, string Error) LaunchProcess(string processPath)
+	// Launch a process by path with optional CLI arguments.
+	public static (bool Success, string Error) LaunchProcess(string processPath, string arguments = null)
 	{
 		if (string.IsNullOrWhiteSpace(processPath)) {
 			return (false, "Process path cannot be empty");
@@ -161,6 +161,11 @@ public static class ProcessTools
 				FileName = processPath,
 				UseShellExecute = true
 			};
+
+			if (!string.IsNullOrWhiteSpace(arguments)) {
+				startInfo.Arguments = arguments;
+			}
+
 			var proc = Process.Start(startInfo);
 			return proc != null
 				? (true, (string)null)
