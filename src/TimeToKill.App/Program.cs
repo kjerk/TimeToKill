@@ -2,8 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
-using CommandLine;
-using CommandLine.Text;
 using Projektanker.Icons.Avalonia;
 using Projektanker.Icons.Avalonia.FontAwesome;
 using TimeToKill.App.Cli;
@@ -19,19 +17,16 @@ public sealed class Program
 	[STAThread]
 	public static void Main(string[] args)
 	{
-		var parseResult = Parser.Default.ParseArguments<CliOptions>(args);
-		if (parseResult.Tag == ParserResultType.NotParsed)
+		var options = CliOptions.Parse(args);
+		if (options == null)
 			return;
-		
-		var options = parseResult.Value;
-		
+
 		if (options.Help) {
 			NativeMethods.AttachToParentConsole();
-			var helpText = HelpText.AutoBuild(parseResult);
-			Console.WriteLine(helpText);
+			CliOptions.PrintHelp();
 			return;
 		}
-		
+
 		InstanceManager = new SingleInstanceManager();
 
 		if (!InstanceManager.TryAcquireInstance()) {
