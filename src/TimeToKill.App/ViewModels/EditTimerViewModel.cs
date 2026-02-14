@@ -4,6 +4,7 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TimeToKill.App.Services;
+using TimeToKill.Extensions;
 using TimeToKill.Models;
 
 namespace TimeToKill.App.ViewModels;
@@ -162,7 +163,7 @@ public partial class EditTimerViewModel : ViewModelBase
 		if (_existingId.HasValue) {
 			preset = new TimerPreset {
 				Id = _existingId.Value,
-				ProcessName = ProcessName.Trim(),
+				ProcessName = ProcessName.Trim().RejectBackslashes(),
 				DisplayLabel = DisplayLabel?.Trim() ?? string.Empty,
 				Duration = GetTotalDuration(),
 				ActionType = actionType,
@@ -172,7 +173,7 @@ public partial class EditTimerViewModel : ViewModelBase
 			_presetRepository.UpdatePreset(preset);
 			isNew = false;
 		} else {
-			preset = new TimerPreset(ProcessName.Trim(), GetTotalDuration(), actionType) {
+			preset = new TimerPreset(ProcessName.Trim().RejectBackslashes(), GetTotalDuration(), actionType) {
 				DisplayLabel = DisplayLabel?.Trim() ?? string.Empty,
 				AutoRunOnStart = AutoRunOnStart
 			};

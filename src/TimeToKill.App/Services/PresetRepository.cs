@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using TimeToKill.Extensions;
 using TimeToKill.Models;
 
 namespace TimeToKill.App.Services;
@@ -42,6 +43,9 @@ public class PresetRepository
 		try {
 			var json = File.ReadAllText(_filePath);
 			_cachedPresets = JsonSerializer.Deserialize<List<TimerPreset>>(json, _jsonOptions) ?? new List<TimerPreset>();
+			foreach (var preset in _cachedPresets) {
+				preset.ProcessName = preset.ProcessName.RejectBackslashes();
+			}
 			return _cachedPresets;
 		} catch {
 			_cachedPresets = new List<TimerPreset>();

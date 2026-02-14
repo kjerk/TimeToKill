@@ -6,4 +6,10 @@ public static class StringExtensions
 	{
 		return !string.IsNullOrWhiteSpace(str);
 	}
+	
+	public static string RejectBackslashes(this string str, bool fallbackToEmpty = true)
+	{
+		if (str == null) return fallbackToEmpty ? string.Empty : null;
+		return str.Replace('\\', '/');
+	}
 }
