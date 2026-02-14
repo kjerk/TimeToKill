@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using CommandLine;
+using CommandLine.Text;
 using Projektanker.Icons.Avalonia;
 using Projektanker.Icons.Avalonia.FontAwesome;
 using TimeToKill.App.Cli;
@@ -18,35 +19,35 @@ public sealed class Program
 	[STAThread]
 	public static void Main(string[] args)
 	{
-		// Attach to parent console so --help output is visible from terminals.
-		// No-op when double-clicked (no parent console to attach to).
-		Console.WriteLine("saklfjhnafskjfasn");
-		NativeMethods.AttachToParentConsole();
-		Console.WriteLine("dfohgjndfkhndfh");
-
 		var parseResult = Parser.Default.ParseArguments<CliOptions>(args);
+		if (parseResult.Tag == ParserResultType.NotParsed)
+			return;
+		
+		var options = parseResult.Value;
+		
+		if (options.Help) {
+			NativeMethods.AttachToParentConsole();
+			var helpText = HelpText.AutoBuild(parseResult);
+			Console.WriteLine(helpText);
+			return;
+		}
+		
+		InstanceManager = new SingleInstanceManager();
 
-		parseResult.WithParsed(options => {
-			InstanceManager = new SingleInstanceManager();
-
-			if (!InstanceManager.TryAcquireInstance()) {
-				// Another instance is running — send commands and exit
-				if (options.HasCommands) {
-					SendCommandsAndExit(options).GetAwaiter().GetResult();
-				}
-				InstanceManager.Dispose();
-				InstanceManager = null;
-				return;
+		if (!InstanceManager.TryAcquireInstance()) {
+			if (options.HasCommands) {
+				SendCommandsAndExit(options).GetAwaiter().GetResult();
 			}
-
-			// First instance — store options and start Avalonia
-			StartupOptions = options;
-			BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
-
-			// Avalonia has exited — clean up
 			InstanceManager.Dispose();
 			InstanceManager = null;
-		});
+			return;
+		}
+
+		StartupOptions = options;
+		BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+
+		InstanceManager.Dispose();
+		InstanceManager = null;
 	}
 
 	private static async Task SendCommandsAndExit(CliOptions options)

@@ -16,4 +16,7 @@ public class CliOptions
 	// public bool List { get; set; }
 
 	public bool HasCommands => StartTimers?.GetEnumerator().MoveNext() == true;
+	
+	[Option("help", Default = false, HelpText = "Display this help text.")]
+	public bool Help { get; set; }
 }
