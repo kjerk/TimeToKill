@@ -12,7 +12,12 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-      actions: read
+
+    env:
+      SCREENSHOTS_DIR: tests/TimeToKill.App.Tests/bin/Debug/net10.0/Screenshots
+      B2_BUCKET: kjerk-github-artifacts
+      B2_ENDPOINT: https://s3.us-west-004.backblazeb2.com
+      B2_PUBLIC_BASE: https://kjerk-github-artifacts.s3.us-west-004.backblazeb2.com
 
     steps:
       - name: Checkout PR
@@ -28,13 +33,12 @@ jobs:
 
       - name: Validate screenshot sizes
         run: |
-          MAX_SIZE=$((5 * 1024 * 1024))  # 5MB per file
-          SCREENSHOTS_DIR="tests/TimeToKill.App.Tests/bin/Debug/net10.0/Screenshots"
+          MAX_SIZE=$((5 * 1024 * 1024))
           if [ -d "$SCREENSHOTS_DIR" ]; then
             for f in "$SCREENSHOTS_DIR"/*.png; do
               size=$(stat -c%s "$f")
               if [ "$size" -gt "$MAX_SIZE" ]; then
-                echo "::error::Screenshot $(basename $f) is ${size} bytes (max ${MAX_SIZE}). Aborting upload."
+                echo "::error::Screenshot $(basename $f) is ${size} bytes (max ${MAX_SIZE}). Aborting."
                 exit 1
               fi
               echo "$(basename $f): ${size} bytes - OK"
@@ -43,131 +47,42 @@ jobs:
             echo "::warning::No screenshots directory found"
           fi
 
-      - name: Upload screenshots
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: screenshots
-          path: tests/TimeToKill.App.Tests/bin/Debug/net10.0/Screenshots/
-          if-no-files-found: warn
+      - name: Upload screenshots to B2
+        run: |
+          PR_NUM=${{ github.event.pull_request.number }}
+          aws s3 sync "$SCREENSHOTS_DIR" "s3://${B2_BUCKET}/pr/${PR_NUM}/" \
+            --endpoint-url "$B2_ENDPOINT" \
+            --delete
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.B2_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.B2_APP_KEY }}
 
-      - name: Try uploading screenshots to GitHub CDN
-        id: upload-images
-        if: success()
+      - name: Comment on PR with screenshots
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            const path = require('path');
-            const screenshotsDir = 'tests/TimeToKill.App.Tests/bin/Debug/net10.0/Screenshots';
+            const dir = process.env.SCREENSHOTS_DIR;
+            const prNum = context.payload.pull_request.number;
+            const base = `${process.env.B2_PUBLIC_BASE}/pr/${prNum}`;
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
 
-            const files = fs.existsSync(screenshotsDir)
-              ? fs.readdirSync(screenshotsDir).filter(f => f.endsWith('.png')).sort()
+            const files = fs.existsSync(dir)
+              ? fs.readdirSync(dir).filter(f => f.endsWith('.png')).sort()
               : [];
 
-            if (files.length === 0) {
-              core.setOutput('result', JSON.stringify({ files: [], urls: {} }));
-              return;
-            }
-
-            const token = process.env.GITHUB_TOKEN;
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const prNumber = context.issue.number;
-            const urls = {};
-
-            for (const file of files) {
-              const filePath = path.join(screenshotsDir, file);
-              const fileData = fs.readFileSync(filePath);
-              const blob = new Blob([fileData], { type: 'image/png' });
-
-              // S1: https://github.com/upload/assets
-              try {
-                const form1 = new FormData();
-                form1.append('file', blob, file);
-                const res1 = await fetch('https://github.com/upload/assets', {
-                  method: 'POST',
-                  headers: { 'Authorization': `token ${token}` },
-                  body: form1
-                });
-                console.log(`S1 ${file}: status=${res1.status}`);
-                const text1 = await res1.text();
-                console.log(`S1 ${file}: body=${text1}`);
-                if (res1.ok) {
-                  try {
-                    const json1 = JSON.parse(text1);
-                    if (json1.url) { urls[file] = json1.url; continue; }
-                  } catch (e) { console.log(`S1 ${file}: not JSON`); }
-                }
-              } catch (e) { console.log(`S1 ${file}: error=${e.message}`); }
-
-              // S2: https://github.com/{owner}/{repo}/issues/{pr}/attachments
-              try {
-                const form2 = new FormData();
-                form2.append('file', blob, file);
-                const res2 = await fetch(
-                  `https://github.com/${owner}/${repo}/issues/${prNumber}/attachments`,
-                  {
-                    method: 'POST',
-                    headers: { 'Authorization': `token ${token}`, 'Accept': 'application/json' },
-                    body: form2
-                  }
-                );
-                console.log(`S2 ${file}: status=${res2.status}`);
-                const text2 = await res2.text();
-                console.log(`S2 ${file}: body=${text2}`);
-                if (res2.ok) {
-                  try {
-                    const json2 = JSON.parse(text2);
-                    if (json2.url) { urls[file] = json2.url; continue; }
-                  } catch (e) { console.log(`S2 ${file}: not JSON`); }
-                }
-              } catch (e) { console.log(`S2 ${file}: error=${e.message}`); }
-
-              console.log(`${file}: both methods failed, no inline URL`);
-            }
-
-            console.log('Upload results:', JSON.stringify(urls, null, 2));
-            core.setOutput('result', JSON.stringify({ files, urls }));
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Comment on PR with screenshots
-        if: success()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-            const uploadResult = JSON.parse('${{ steps.upload-images.outputs.result }}' || '{"files":[],"urls":{}}');
-            const { files, urls } = uploadResult;
-
-            let body = `## Screenshot Results\n\n`;
+            let body = `## Screenshots\n\n`;
 
             if (files.length === 0) {
               body += `No screenshots captured.\n`;
             } else {
-              const hasInline = Object.keys(urls).length > 0;
-
-              if (hasInline) {
-                for (const file of files) {
-                  if (urls[file]) {
-                    body += `### ${file}\n![${file}](${urls[file]})\n\n`;
-                  } else {
-                    body += `### ${file}\n_Upload failed - see artifacts_\n\n`;
-                  }
-                }
-              } else {
-                body += `| # | Screenshot |\n|---|---|\n`;
-                for (const f of files) {
-                  body += `| ${f} | :white_check_mark: |\n`;
-                }
-                body += `\n_Inline image upload not available._\n`;
+              for (const file of files) {
+                const name = file.replace(/^\d+_/, '').replace('.png', '').replace(/-/g, ' ');
+                body += `**${name}**\n\n![${file}](${base}/${file})\n\n`;
               }
-
-              body += `\n[Download all screenshots](${runUrl}#artifacts)\n`;
             }
 
-            body += `\n---\n_[PR Screenshots workflow](${runUrl})_`;
+            body += `---\n_[workflow run](${runUrl})_`;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
@@ -189,6 +104,5 @@ jobs:
                 name: 'run-tests'
               });
             } catch (e) {
-              // Label may have already been removed
               console.log('Could not remove label:', e.message);
             }
