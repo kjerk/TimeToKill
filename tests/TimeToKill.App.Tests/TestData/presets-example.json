@@ -1,0 +1,46 @@
+[
+  {
+    "id": "ab00e69e-2c00-4653-98f7-39146c2dc234",
+    "processName": "C:\\Apps\\Notepad3.exe",
+    "displayLabel": "Better Type Fast",
+    "duration": "00:00:08",
+    "actionType": 4,
+    "actionArgs": "",
+    "autoRunOnStart": false,
+    "sortOrder": 0,
+    "createdAt": "2026-02-04T00:10:06.5610219Z"
+  },
+  {
+    "id": "dbfbbf71-d5f9-465d-93d5-904443559d0b",
+    "processName": "discord.exe",
+    "displayLabel": "",
+    "duration": "00:30:00",
+    "actionType": 1,
+    "actionArgs": "",
+    "autoRunOnStart": false,
+    "sortOrder": 1,
+    "createdAt": "2026-02-03T23:32:44.5861194Z"
+  },
+  {
+    "id": "1acf386c-ee4d-491d-a473-48713e1d6705",
+    "processName": "notepad3.exe",
+    "displayLabel": "",
+    "duration": "00:00:05",
+    "actionType": 1,
+    "actionArgs": "",
+    "autoRunOnStart": false,
+    "sortOrder": 2,
+    "createdAt": "2026-02-03T20:11:17.6255278Z"
+  },
+  {
+    "id": "c1c5302d-439d-4da1-90ba-c45df318d41d",
+    "processName": "C:/Apps/Discord/app-1.0.9222/Discord.exe",
+    "displayLabel": "",
+    "duration": "00:30:00",
+    "actionType": 4,
+    "actionArgs": "",
+    "autoRunOnStart": false,
+    "sortOrder": 3,
+    "createdAt": "2026-02-04T00:08:00.2308256Z"
+  }
+]

@@ -11,20 +11,25 @@ public class PresetRepository
 	private readonly string _filePath;
 	private readonly JsonSerializerOptions _jsonOptions;
 	private List<TimerPreset> _cachedPresets;
-	
-	public PresetRepository()
+
+	public PresetRepository() : this(GetDefaultFilePath()) { }
+
+	public PresetRepository(string filePath)
 	{
-		var homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-		var configFolder = Path.Combine(homeDir, ".config", "timetokill");
-		Directory.CreateDirectory(configFolder);
-		_filePath = Path.Combine(configFolder, "presets.json");
-		
+		_filePath = filePath;
 		_jsonOptions = new JsonSerializerOptions {
 			WriteIndented = true,
 			PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 		};
-		
 		_cachedPresets = new List<TimerPreset>();
+	}
+
+	private static string GetDefaultFilePath()
+	{
+		var homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+		var configFolder = Path.Combine(homeDir, ".config", "timetokill");
+		Directory.CreateDirectory(configFolder);
+		return Path.Combine(configFolder, "presets.json");
 	}
 	
 	public List<TimerPreset> LoadPresets()
