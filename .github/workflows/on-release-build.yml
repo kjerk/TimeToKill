@@ -1,0 +1,50 @@
+name: BUILD - Create Release Artifacts
+
+on:
+  release:
+    types: [ published ]
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: windows-latest
+
+    env:
+      RELEASE_DIR: TimeToKill-${{ github.ref_name }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SETUP - .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: BUILD - Publish win-x64
+        run: |
+          $version = "${{ github.ref_name }}" -replace '^v', ''
+          echo "Building version $version (from tag ${{ github.ref_name }})"
+
+          dotnet publish src/TimeToKill.App/TimeToKill.App.csproj `
+            -c Release `
+            -r win-x64 `
+            --no-self-contained `
+            -p:PublishSingleFile=true `
+            -p:Version=$version `
+            -o ${{ env.RELEASE_DIR }}
+
+      - name: BUILD - Create zip
+        run: |
+          Compress-Archive -Path ${{ env.RELEASE_DIR }} -DestinationPath ${{ env.RELEASE_DIR }}.zip
+          echo "Artifact: ${{ env.RELEASE_DIR }}.zip"
+          Get-ChildItem ${{ env.RELEASE_DIR }}.zip
+
+      - name: DEPLOY - Upload artifact to release
+        run: |
+          gh release upload ${{ github.ref_name }} `
+            ${{ env.RELEASE_DIR }}.zip `
+            --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
