@@ -3,6 +3,9 @@
 !build_standalone.bat
 *.env
 
+# Repo Facilities
+/worktrees/
+
 # Logs
 logs/
 *.log
