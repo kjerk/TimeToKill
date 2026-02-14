@@ -33,6 +33,7 @@ jobs:
             --no-self-contained `
             -p:PublishSingleFile=true `
             -p:Version=$version `
+            -p:DebugType=none `
             -o ${{ env.RELEASE_DIR }}
 
       - name: BUILD - Create zip
