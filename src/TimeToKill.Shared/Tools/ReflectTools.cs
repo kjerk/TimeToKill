@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using TimeToKill.Extensions;
+#pragma warning disable CS0168 // Variable is declared but never used
 
 namespace TimeToKill.Tools;
 
